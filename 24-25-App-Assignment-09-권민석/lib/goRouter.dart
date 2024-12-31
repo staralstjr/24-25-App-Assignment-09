@@ -1,10 +1,10 @@
 import 'package:go_router/go_router.dart';
-import 'package:nine_session/BoardDetails.dart';
-import 'package:nine_session/CreateBoard.dart';
-import 'package:nine_session/EditBoard.dart';
+import 'BoardDetails.dart';
+import 'CreateBoard.dart';
+import 'EditBoard.dart';
 import 'login.dart';
 import 'signUp.dart';
-import 'home.dart'; // 홈 화면 추가
+import 'home.dart';
 
 final GoRouter router = GoRouter(
   routes: [
@@ -21,7 +21,7 @@ final GoRouter router = GoRouter(
       builder: (context, state) => LoginPage(),
     ),
     GoRoute(
-      path: '/home', // 홈 경로 추가
+      path: '/home',
       builder: (context, state) => HomePage(),
     ),
     GoRoute(
@@ -31,20 +31,21 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/BoardDetails',
       builder: (context, state) {
-        final extra = state.extra as Map<String, dynamic>;
-        return BoardDetails(
-          board: extra['board'],
-          onDelete: extra['onDelete'],
-          onEdit: extra['onEdit'],
-        );
+        final board = state.extra as Map<String, String>;
+        return BoardDetails(board: board);
       },
     ),
     GoRoute(
       path: '/EditBoard',
       builder: (context, state) {
         final board = state.extra as Map<String, String>;
-        return EditBoard(board: board);
+        return EditBoard(
+          board: board,
+          onEdit: (updatedBoard) {
+            context.pop(updatedBoard);
+          },
+        );
       },
-    ),
+    )
   ],
 );

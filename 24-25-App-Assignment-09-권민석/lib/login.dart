@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'API.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
 final _formKey = GlobalKey<FormState>();
 final TextEditingController usernameController = TextEditingController();
 final TextEditingController passwordController = TextEditingController();
+final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
 class LoginPage extends StatelessWidget {
   final API api = API();
@@ -65,7 +67,7 @@ class LoginPage extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    context.go('/signUp'); // 회원가입 페이지로 이동
+                    context.go('/signUp');
                   },
                   child: Text(
                     "Don't have an account? Sign up",
@@ -85,15 +87,18 @@ class LoginPage extends StatelessWidget {
       final username = usernameController.text;
       final password = passwordController.text;
 
-      final success = await api.login(username, password);
-      if (success) {
+      final accessToken = await api.login(username, password);
+      if (accessToken != null) {
+        await secureStorage.write(key: 'access_token', value: accessToken);
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login Successful')),
         );
-        context.go('/home'); // 로그인 성공 시 홈 화면으로 이동 (홈 경로 필요)
+        context.go('/home');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login Failed')),
+          const SnackBar(
+              content: Text('Login Failed. Please check your credentials.')),
         );
       }
     }

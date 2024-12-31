@@ -49,7 +49,7 @@ class SignUpPage extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  context.go('/login'); // 로그인 페이지로 이동
+                  context.go('/login');
                 },
                 child: Text(
                   'Already have an account? Log in',
@@ -72,29 +72,36 @@ class SignUpPage extends StatelessWidget {
       return;
     }
 
-    final success = await _createAccount(username, password);
-    if (success) {
-      _showMessage(context, 'Account created successfully!');
-      context.go('/login'); // 회원가입 성공 시 로그인 페이지로 이동
+    final Map<String, dynamic>? response =
+        await _createAccount(username, password);
+    if (response != null && response.containsKey('id')) {
+      final userId = response['id'];
+      _showMessage(context, 'Account created successfully! Your ID: $userId');
+      context.go('/login');
     } else {
       _showMessage(context, 'Sign-up failed. Try again.');
     }
   }
 
-  Future<bool> _createAccount(String username, String password) async {
+  Future<Map<String, dynamic>?> _createAccount(
+      String username, String password) async {
     try {
-      final url = Uri.parse(
-          'https://api.labyrinth30-tech.link/auth/register'); // 회원가입 URL
+      final url = Uri.parse('https://api.labyrinth30-tech.link/auth/register');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'username': username, 'password': password}),
       );
 
-      return response.statusCode == 201; // 201 상태 코드를 성공으로 처리
+      if (response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        print('Sign-up failed. Status code: ${response.statusCode}');
+        return null;
+      }
     } catch (e) {
       print('Error: $e');
-      return false;
+      return null;
     }
   }
 
