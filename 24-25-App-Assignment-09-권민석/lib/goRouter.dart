@@ -10,7 +10,7 @@ final GoRouter router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => SignUpPage(),
+      builder: (context, state) => LoginPage(),
     ),
     GoRoute(
       path: '/signUp',
